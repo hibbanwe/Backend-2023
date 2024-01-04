@@ -1,6 +1,4 @@
-// TODO 3: Import data students dari folder data/students.js
-// code here
-const { request } = require("express");
+// import model student
 const Student = require("../models/Student")
 
 class StudentController {
@@ -23,47 +21,106 @@ class StudentController {
          * Mengembalikan response dalam bentuk json.
          */
 
-        const { nama, nim, email, jurusan } = req.body
         const students = await Student.create(req.body);
         const data = {
             message: "Menambahkan data student",
-            data: students
+            data: students,
         };
 
         res.status(201).json(data);
     }
 
-    // update(req, res) {
-    //     const { id } = req.params;
-    //     const { nama } = req.body;
 
-    //     // TODO 6: Update data students
-    //     // code here
-    //     students[id] = nama;
+    async update(req, res) {
+        /**
+         * check id students
+         * jika ada, lakukan update
+         * jika tidak, kirim data tidak ada
+         */
+        const { id } = req.params;
 
-    //     const data = {
-    //         message: `Mengedit data students id ${id}, nama ${nama}`,
-    //         data: students
-    //     };
+        const students = await Student.find(id);
 
-    //     res.json(data);
-    // }
+        if (students) {
+            // update data
+            const studentUpdated = await Student.update(id, req.body);
+            const data = {
+                message: "Mengupdate data student",
+                data: studentUpdated,
+            };
 
-    // destroy(req, res) {
-    //     const { id } = req.params;
+            res.status(200).json(data);
+        }
+        else {
+            // kirim data tidak ada
+            const data = {
+                message: "Data tidak ada",
+            };
 
-    //     // TODO 7: Hapus data students
-    //     // code here
+            res.status(404).json(data);
+        }
 
-    //     students.splice(id, 1);
 
-    //     const data = {
-    //         message: `Menghapus data students ${id}`,
-    //         data: students
-    //     };
 
-    //     res.json(data);
-    // }
+    }
+
+    async destroy(req, res) {
+        const { id } = req.params;
+
+        /**
+         * cari id
+         * jika ada, hapus data
+         * jika tidak, kirim data tidak ada
+         */
+
+        const student = await Student.find(id);
+
+        if (student) {
+            // hapus data
+            await Student.delete(id);
+            const data = {
+                message: "Menghapus data student",
+            };
+
+            res.status(200).json(data);
+        }
+        else {
+            // data tidak ada
+            const data = {
+                message: "Data tidak ada",
+            };
+
+            res.status(404).json(data);
+        }
+    }
+
+    async show(req, res) {
+        /**
+         * cari id
+         * jika ada, kirim datanya
+         * jika tidak, kirim data tidak ada
+         */
+        const { id } = req.params;
+
+        const student = await Student.find(id);
+
+        if (student) {
+            const data = {
+                message: "Menampilkan detail data student",
+                data: student,
+            };
+
+            res.status(200).json(data);
+        }
+        else {
+            const data = {
+                message: "Data tidak ada",
+            };
+
+            res.status(404).json(data);
+        }
+
+    }
 }
 
 // make an object Student Controller
